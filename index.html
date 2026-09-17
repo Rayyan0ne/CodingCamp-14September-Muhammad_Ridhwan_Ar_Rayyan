@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Expense & Budget Visualizer | Track Your Spending</title>
-  <meta name="description" content="A beautiful, client-side expense tracker with real-time charts, custom categories, and dark/light mode — no account needed." />
+  <title>KrayBudget | Track Your Spending</title>
+  <meta name="description" content="KrayBudget — your smart, client-side budget companion with real-time charts, custom categories, and dark/light mode. No account needed." />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -28,6 +28,49 @@
 </head>
 <body>
 
+  <!-- ─── Splash Screen ─── -->
+  <div id="splash-screen" class="splash" aria-hidden="true" role="dialog" aria-label="Welcome to KrayBudget">
+    <!-- Floating orbs background -->
+    <div class="splash-orb splash-orb-1"></div>
+    <div class="splash-orb splash-orb-2"></div>
+    <div class="splash-orb splash-orb-3"></div>
+    <div class="splash-orb splash-orb-4"></div>
+
+    <!-- Particle dots -->
+    <div class="splash-particles">
+      <span class="splash-particle"></span>
+      <span class="splash-particle"></span>
+      <span class="splash-particle"></span>
+      <span class="splash-particle"></span>
+      <span class="splash-particle"></span>
+      <span class="splash-particle"></span>
+      <span class="splash-particle"></span>
+      <span class="splash-particle"></span>
+    </div>
+
+    <!-- Main splash content -->
+    <div class="splash-content">
+      <!-- Logo icon -->
+      <div class="splash-logo" aria-hidden="true">
+        <span class="splash-logo-icon">◈</span>
+      </div>
+
+      <!-- Welcome text -->
+      <p class="splash-welcome-text">WELCOME TO</p>
+
+      <!-- Brand name -->
+      <h1 class="splash-brand">KrayBudget</h1>
+
+      <!-- Tagline -->
+      <p class="splash-tagline">Your smart budget companion ✦</p>
+
+      <!-- Click anywhere CTA -->
+      <div class="splash-cta-wrap">
+        <p class="splash-cta" id="splash-cta">— tap anywhere to enter —</p>
+      </div>
+    </div>
+  </div>
+
   <!-- ─── Toast Container ─── -->
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
@@ -36,7 +79,7 @@
     <div class="header-inner">
       <div class="brand">
         <span class="brand-icon">◈</span>
-        <span class="brand-name">BudgetViz</span>
+        <span class="brand-name">KrayBudget</span>
       </div>
       <button
         id="theme-toggle"

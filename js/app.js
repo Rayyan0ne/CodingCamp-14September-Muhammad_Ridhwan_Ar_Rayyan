@@ -1,6 +1,6 @@
 /**
  * ============================================================
- * Expense & Budget Visualizer — app.js
+ * KrayBudget — app.js
  * Vanilla JavaScript, no frameworks, no build tools.
  * All data persists in localStorage.
  * ============================================================
@@ -979,3 +979,45 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
+/* ─── Splash Screen Lifecycle ───────────────────────────── */
+
+(function initSplash() {
+  const splash = document.getElementById('splash-screen');
+  if (!splash) return;
+
+  let dismissed = false;
+
+  /**
+   * Dismiss the splash with exit animation, then hide.
+   * Guard against double-calls.
+   */
+  function dismissSplash() {
+    if (dismissed) return;
+    dismissed = true;
+
+    splash.classList.add('splash-exit');
+
+    // After exit animation finishes (600ms), remove from layout
+    splash.addEventListener('animationend', () => {
+      splash.classList.add('splash-hidden');
+    }, { once: true });
+  }
+
+  // Clicking anywhere on the splash screen enters the dashboard.
+  // We wait 2.6s before enabling clicks so the CTA text has appeared
+  // (avoids accidental immediate dismissal on page load).
+  let clickEnabled = false;
+  setTimeout(() => { clickEnabled = true; }, 2600);
+
+  splash.addEventListener('click', () => {
+    if (clickEnabled) dismissSplash();
+  });
+
+  // Keyboard: press Enter or Space to continue (accessibility)
+  document.addEventListener('keydown', (e) => {
+    if (!dismissed && clickEnabled && (e.key === 'Enter' || e.key === ' ')) {
+      dismissSplash();
+    }
+  });
+})();

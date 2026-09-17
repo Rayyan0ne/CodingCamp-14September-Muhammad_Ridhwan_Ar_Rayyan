@@ -1,6 +1,6 @@
 /* ============================================================
-   Expense & Budget Visualizer — style.css
-   Author: BudgetViz Project
+   KrayBudget — style.css
+   Author: KrayBudget Project
    Fonts: Space Grotesk (UI), JetBrains Mono (numbers)
    ============================================================ */
 
@@ -1400,4 +1400,296 @@ input[type="number"] { -moz-appearance: textfield; }
   color: var(--accent-danger) !important;
   text-shadow: var(--glow-danger);
   transition: color 300ms ease, text-shadow 300ms ease;
+}
+
+/* ─── Splash Screen ──────────────────────────────────────── */
+
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 40% 50%, #0d1629 0%, #0A0E17 60%, #06080f 100%);
+  overflow: hidden;
+  animation: splashFadeIn 0.4s ease both;
+}
+
+.splash.splash-exit {
+  animation: splashSlideOut 0.55s cubic-bezier(0.55, 0, 1, 0.45) both;
+  pointer-events: none;
+}
+
+/* ─── Floating orbs ─── */
+
+.splash-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0;
+  animation: orbFloat 0.8s ease forwards;
+}
+
+.splash-orb-1 {
+  width: 420px;
+  height: 420px;
+  top: -80px;
+  left: -100px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, transparent 70%);
+  animation-delay: 0.1s;
+  animation-duration: 6s;
+  animation-name: orbFloat1;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  opacity: 0.6;
+}
+
+.splash-orb-2 {
+  width: 350px;
+  height: 350px;
+  bottom: -60px;
+  right: -80px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, transparent 70%);
+  animation-name: orbFloat2;
+  animation-duration: 8s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  animation-delay: 0.5s;
+  opacity: 0.6;
+}
+
+.splash-orb-3 {
+  width: 250px;
+  height: 250px;
+  top: 30%;
+  right: 10%;
+  background: radial-gradient(circle, rgba(34, 255, 161, 0.1) 0%, transparent 70%);
+  animation-name: orbFloat3;
+  animation-duration: 7s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  animation-delay: 1s;
+  opacity: 0.5;
+}
+
+.splash-orb-4 {
+  width: 200px;
+  height: 200px;
+  bottom: 20%;
+  left: 15%;
+  background: radial-gradient(circle, rgba(255, 184, 48, 0.08) 0%, transparent 70%);
+  animation-name: orbFloat4;
+  animation-duration: 9s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  animation-delay: 0.3s;
+  opacity: 0.4;
+}
+
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(30px, 40px) scale(1.05); }
+  66%       { transform: translate(-20px, 20px) scale(0.95); }
+}
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%       { transform: translate(-40px, -30px) scale(1.1); }
+  70%       { transform: translate(20px, 10px) scale(0.92); }
+}
+@keyframes orbFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(-25px, 35px) scale(1.08); }
+}
+@keyframes orbFloat4 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  45%       { transform: translate(35px, -25px) scale(1.06); }
+}
+
+/* ─── Particles ─── */
+
+.splash-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.splash-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  opacity: 0;
+  animation: particleDrift 5s ease-in-out infinite;
+}
+
+.splash-particle:nth-child(1)  { top: 15%; left: 20%; animation-delay: 0.2s; animation-duration: 5s; }
+.splash-particle:nth-child(2)  { top: 70%; left: 80%; animation-delay: 0.8s; animation-duration: 6s; background: var(--accent-secondary); }
+.splash-particle:nth-child(3)  { top: 40%; left: 10%; animation-delay: 1.2s; animation-duration: 7s; }
+.splash-particle:nth-child(4)  { top: 85%; left: 30%; animation-delay: 0.5s; animation-duration: 4.5s; background: var(--accent-success); }
+.splash-particle:nth-child(5)  { top: 10%; left: 75%; animation-delay: 1.5s; animation-duration: 5.5s; background: var(--accent-secondary); }
+.splash-particle:nth-child(6)  { top: 60%; left: 55%; animation-delay: 0.3s; animation-duration: 6.5s; }
+.splash-particle:nth-child(7)  { top: 30%; left: 90%; animation-delay: 1.8s; animation-duration: 4s; background: var(--accent-success); }
+.splash-particle:nth-child(8)  { top: 90%; left: 65%; animation-delay: 0.9s; animation-duration: 5.8s; }
+
+@keyframes particleDrift {
+  0%   { opacity: 0; transform: translateY(0) scale(0.5); }
+  20%  { opacity: 0.7; }
+  80%  { opacity: 0.4; }
+  100% { opacity: 0; transform: translateY(-60px) scale(1.2); }
+}
+
+/* ─── Splash content ─── */
+
+.splash-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Logo icon */
+.splash-logo {
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: splashLogoReveal 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+
+.splash-logo-icon {
+  font-size: 4rem;
+  color: var(--accent-primary);
+  filter: drop-shadow(0 0 24px rgba(0, 240, 255, 0.7));
+  display: block;
+  animation: logoPulse 2.5s ease-in-out 1s infinite;
+}
+
+@keyframes splashLogoReveal {
+  from { opacity: 0; transform: scale(0.3) rotate(-15deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes logoPulse {
+  0%, 100% { filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.6)); transform: scale(1); }
+  50%       { filter: drop-shadow(0 0 40px rgba(0, 240, 255, 0.95)); transform: scale(1.06); }
+}
+
+/* "WELCOME TO" text */
+.splash-welcome-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.45em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  opacity: 0;
+  animation: splashSlideDown 0.6s ease 0.7s both;
+}
+
+@keyframes splashSlideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* "KrayBudget" brand name — smooth blur reveal */
+.splash-brand {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(3rem, 10vw, 5.5rem);
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 1.2rem;
+  background: linear-gradient(135deg, #00F0FF 0%, #A855F7 55%, #22FFA1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0;
+  white-space: nowrap;
+  animation:
+    brandReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 1.0s both,
+    brandGlow   3s ease-in-out 2.2s infinite;
+}
+
+@keyframes brandReveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.94);
+    filter: blur(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes brandGlow {
+  0%, 100% { filter: drop-shadow(0 0 22px rgba(0, 240, 255, 0.4)); }
+  50%       { filter: drop-shadow(0 0 48px rgba(168, 85, 247, 0.6)); }
+}
+
+/* Tagline */
+.splash-tagline {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-bottom: 0;
+  opacity: 0;
+  animation: splashFadeUp 0.8s ease 2.0s both;
+}
+
+@keyframes splashFadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* "Tap anywhere to enter" CTA */
+.splash-cta-wrap {
+  margin-top: 3rem;
+  opacity: 0;
+  animation: splashFadeUp 0.7s ease 2.5s both;
+}
+
+.splash-cta {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  animation: ctaPulse 2s ease-in-out 3s infinite;
+}
+
+@keyframes ctaPulse {
+  0%, 100% { opacity: 0.5; color: var(--text-muted); }
+  50%       { opacity: 1;   color: var(--accent-primary); text-shadow: 0 0 12px rgba(0, 240, 255, 0.5); }
+}
+
+/* Fade in for entire splash */
+@keyframes splashFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Exit animation: slide up + fade out */
+@keyframes splashSlideOut {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-100%) scale(0.97); }
+}
+
+/* After hidden */
+.splash.splash-hidden {
+  display: none !important;
+}
+
+/* Splash cursor: indicate whole screen is clickable */
+.splash {
+  cursor: pointer;
 }
