@@ -74,6 +74,26 @@
   <!-- ─── Toast Container ─── -->
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
+  <!-- ─── Exit Confirmation Modal ─── -->
+  <div id="exit-modal-overlay" class="exit-modal-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="exit-modal-title">
+    <div class="exit-modal-card">
+      <!-- Icon -->
+      <div class="exit-modal-icon-wrap" aria-hidden="true">
+        <span class="exit-modal-icon">⏻</span>
+      </div>
+      <!-- Text -->
+      <h2 class="exit-modal-title" id="exit-modal-title">Yakin mau keluar?</h2>
+      <p class="exit-modal-sub">Kamu akan dibawa kembali ke halaman welcome. Data kamu tetap tersimpan.</p>
+      <!-- Actions -->
+      <div class="exit-modal-actions">
+        <button id="exit-modal-cancel" class="exit-modal-btn exit-modal-btn-cancel" type="button">Batal</button>
+        <button id="exit-modal-confirm" class="exit-modal-btn exit-modal-btn-confirm" type="button">
+          <span>Ya, Keluar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ─── Header ─── -->
   <header class="app-header">
     <div class="header-inner">
@@ -81,19 +101,30 @@
         <span class="brand-icon">◈</span>
         <span class="brand-name">KrayBudget</span>
       </div>
-      <button
-        id="theme-toggle"
-        class="theme-toggle"
-        aria-label="Toggle dark/light mode"
-        title="Toggle theme"
-      >
-        <span class="toggle-track">
-          <span class="toggle-thumb">
-            <span class="icon-sun" aria-hidden="true">☀</span>
-            <span class="icon-moon" aria-hidden="true">☽</span>
+      <div class="header-actions">
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          aria-label="Toggle dark/light mode"
+          title="Toggle theme"
+        >
+          <span class="toggle-track">
+            <span class="toggle-thumb">
+              <span class="icon-sun" aria-hidden="true">☀</span>
+              <span class="icon-moon" aria-hidden="true">☽</span>
+            </span>
           </span>
-        </span>
-      </button>
+        </button>
+        <button
+          id="btn-exit"
+          class="btn-exit"
+          aria-label="Kembali ke halaman welcome"
+          title="Keluar ke Welcome Screen"
+        >
+          <span class="btn-exit-icon" aria-hidden="true">⏻</span>
+          <span class="btn-exit-label">Keluar</span>
+        </button>
+      </div>
     </div>
   </header>
 

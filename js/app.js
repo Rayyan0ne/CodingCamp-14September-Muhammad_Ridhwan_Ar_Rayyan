@@ -1021,3 +1021,109 @@ if (document.readyState === 'loading') {
     }
   });
 })();
+
+/* ─── Exit Button + Confirmation Modal ──────────────────── */
+
+(function initExitFlow() {
+  const btnExit      = document.getElementById('btn-exit');
+  const modalOverlay = document.getElementById('exit-modal-overlay');
+  const btnCancel    = document.getElementById('exit-modal-cancel');
+  const btnConfirm   = document.getElementById('exit-modal-confirm');
+  const splash       = document.getElementById('splash-screen');
+
+  // Guard: all elements must exist
+  if (!btnExit || !modalOverlay || !btnCancel || !btnConfirm || !splash) return;
+
+  /* ── Modal helpers ── */
+
+  function openModal() {
+    modalOverlay.classList.add('exit-modal-open');
+    modalOverlay.setAttribute('aria-hidden', 'false');
+    btnCancel.focus();
+  }
+
+  function closeModal() {
+    modalOverlay.classList.remove('exit-modal-open');
+    modalOverlay.setAttribute('aria-hidden', 'true');
+    btnExit.focus();
+  }
+
+  /* ── Return to welcome screen ── */
+
+  function returnToSplash() {
+    closeModal();
+
+    // Wait for modal close animation (280ms), then transition
+    setTimeout(() => {
+      const appMain   = document.querySelector('.app-main');
+      const appHeader = document.querySelector('.app-header');
+
+      // 1. Fade out the app
+      if (appMain)   { appMain.style.transition   = 'opacity 0.4s ease'; appMain.style.opacity   = '0'; }
+      if (appHeader) { appHeader.style.transition = 'opacity 0.4s ease'; appHeader.style.opacity = '0'; }
+
+      // 2. After fade-out completes, show splash again
+      setTimeout(() => {
+        // Remove exit/hidden classes so splash re-renders with all animations
+        splash.classList.remove('splash-exit', 'splash-hidden');
+
+        // Force reflow so @keyframes restart from the beginning
+        void splash.offsetWidth;
+
+        // Signal the reshow handler to re-enable click-to-enter
+        splash.dispatchEvent(new CustomEvent('splash:reshow'));
+
+        // Restore app opacity (it sits behind the splash)
+        if (appMain)   { appMain.style.opacity   = '1'; appMain.style.transition   = ''; }
+        if (appHeader) { appHeader.style.opacity  = '1'; appHeader.style.transition = ''; }
+
+      }, 430); // after fade-out duration
+    }, 300);   // after modal close animation
+  }
+
+  /* ── Event listeners ── */
+
+  btnExit.addEventListener('click', openModal);
+  btnCancel.addEventListener('click', closeModal);
+  btnConfirm.addEventListener('click', returnToSplash);
+
+  // Click backdrop to close
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) closeModal();
+  });
+
+  // Escape key to close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalOverlay.classList.contains('exit-modal-open')) {
+      closeModal();
+    }
+  });
+})();
+
+/* ─── Splash reshow click-to-enter patch ────────────────── */
+// Re-attaches the click handler when splash is shown again via the
+// exit flow, so user must click to enter the dashboard on each visit.
+
+(function patchSplashReshow() {
+  const splash = document.getElementById('splash-screen');
+  if (!splash) return;
+
+  splash.addEventListener('splash:reshow', () => {
+    let reshowClickEnabled = false;
+    const enableTimer = setTimeout(() => { reshowClickEnabled = true; }, 2600);
+
+    function handleReshowClick() {
+      if (!reshowClickEnabled) return;
+      clearTimeout(enableTimer);
+
+      splash.classList.add('splash-exit');
+      splash.addEventListener('animationend', () => {
+        splash.classList.add('splash-hidden');
+      }, { once: true });
+
+      splash.removeEventListener('click', handleReshowClick);
+    }
+
+    splash.addEventListener('click', handleReshowClick);
+  });
+})();
