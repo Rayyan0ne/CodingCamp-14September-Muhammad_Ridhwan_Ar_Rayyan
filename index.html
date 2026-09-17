@@ -90,6 +90,44 @@
         <button id="exit-modal-confirm" class="exit-modal-btn exit-modal-btn-confirm" type="button">
           <span>Ya, Keluar</span>
         </button>
+      </div><!-- /exit-modal-actions -->
+    </div><!-- /exit-modal-card -->
+  </div><!-- /exit-modal-overlay -->
+
+  <!-- ─── Budget Limit Warning Modal ─── -->
+  <div id="budget-warn-overlay" class="budget-warn-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="budget-warn-title">
+    <div class="budget-warn-card">
+      <!-- Icon -->
+      <div class="budget-warn-icon-wrap" aria-hidden="true">
+        <span class="budget-warn-icon">⚠</span>
+      </div>
+      <!-- Text -->
+      <h2 class="budget-warn-title" id="budget-warn-title">Batas Pengeluaran Terlampaui!</h2>
+      <p class="budget-warn-sub">Transaksi ini akan melebihi limit budget yang kamu tetapkan.</p>
+      <!-- Breakdown info -->
+      <div class="budget-warn-breakdown">
+        <div class="bw-row">
+          <span class="bw-label">Budget limit</span>
+          <span class="bw-value" id="bw-limit">Rp 0</span>
+        </div>
+        <div class="bw-row">
+          <span class="bw-label">Sudah dikeluarkan</span>
+          <span class="bw-value" id="bw-spent">Rp 0</span>
+        </div>
+        <div class="bw-row">
+          <span class="bw-label">Transaksi ini</span>
+          <span class="bw-value" id="bw-new">Rp 0</span>
+        </div>
+        <div class="bw-divider"></div>
+        <div class="bw-row bw-row-total">
+          <span class="bw-label">Total jadi</span>
+          <span class="bw-value bw-value-over" id="bw-total">Rp 0</span>
+        </div>
+      </div>
+      <!-- Actions -->
+      <div class="budget-warn-actions">
+        <button id="budget-warn-cancel" class="budget-warn-btn budget-warn-btn-cancel" type="button">Batal</button>
+        <button id="budget-warn-confirm" class="budget-warn-btn budget-warn-btn-confirm" type="button">Tetap Lanjutkan</button>
       </div>
     </div>
   </div>

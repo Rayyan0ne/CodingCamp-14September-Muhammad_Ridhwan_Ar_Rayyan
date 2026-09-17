@@ -733,12 +733,22 @@ txForm.addEventListener('submit', (e) => {
 
   if (!valid) return;
 
-  // Create ripple effect on button
+  // ── Budget limit guard ──
+  // Only intercept when a limit is set AND the new total would exceed it
+  if (state.budgetLimit > 0) {
+    const currentTotal = state.transactions.reduce((sum, t) => sum + t.amount, 0);
+    const newTotal     = currentTotal + amount;
+
+    if (newTotal > state.budgetLimit) {
+      // Open warning modal and pause — user must confirm or cancel
+      openBudgetWarnModal({ name, amount, category, currentTotal, newTotal });
+      return; // Do NOT add transaction yet
+    }
+  }
+
+  // No limit conflict — proceed normally
   createRipple(btnSubmit);
-
   addTransaction(name, amount, category);
-
-  // Reset form
   inputName.value   = '';
   inputAmount.value = '';
   clearErrors();
@@ -1125,5 +1135,84 @@ if (document.readyState === 'loading') {
     }
 
     splash.addEventListener('click', handleReshowClick);
+  });
+})();
+
+/* ─── Budget Warning Modal Logic ────────────────────────── */
+
+/**
+ * Opens the budget warning modal with the pending transaction data.
+ * Populates the breakdown figures before showing.
+ * @param {{ name, amount, category, currentTotal, newTotal }} pending
+ */
+function openBudgetWarnModal(pending) {
+  const overlay  = document.getElementById('budget-warn-overlay');
+  const elLimit  = document.getElementById('bw-limit');
+  const elSpent  = document.getElementById('bw-spent');
+  const elNew    = document.getElementById('bw-new');
+  const elTotal  = document.getElementById('bw-total');
+
+  if (!overlay) return;
+
+  // Populate breakdown figures
+  elLimit.textContent = `Rp ${formatRp(state.budgetLimit)}`;
+  elSpent.textContent = `Rp ${formatRp(pending.currentTotal)}`;
+  elNew.textContent   = `Rp ${formatRp(pending.amount)}`;
+  elTotal.textContent = `Rp ${formatRp(pending.newTotal)}`;
+
+  // Show modal
+  overlay.classList.add('budget-warn-open');
+  overlay.setAttribute('aria-hidden', 'false');
+
+  // Focus cancel button for safety
+  const btnCancel = document.getElementById('budget-warn-cancel');
+  if (btnCancel) btnCancel.focus();
+
+  // Store pending data on overlay for confirm handler to use
+  overlay._pending = pending;
+}
+
+(function initBudgetWarnModal() {
+  const overlay   = document.getElementById('budget-warn-overlay');
+  const btnCancel = document.getElementById('budget-warn-cancel');
+  const btnConfirm = document.getElementById('budget-warn-confirm');
+
+  if (!overlay || !btnCancel || !btnConfirm) return;
+
+  function closeWarnModal() {
+    overlay.classList.remove('budget-warn-open');
+    overlay.setAttribute('aria-hidden', 'true');
+    overlay._pending = null;
+  }
+
+  // Cancel — discard pending transaction
+  btnCancel.addEventListener('click', closeWarnModal);
+
+  // Confirm — add the transaction anyway despite over-limit
+  btnConfirm.addEventListener('click', () => {
+    const pending = overlay._pending;
+    closeWarnModal();
+
+    if (!pending) return;
+
+    // Proceed with the transaction that was held
+    createRipple(btnSubmit);
+    addTransaction(pending.name, pending.amount, pending.category);
+    inputName.value   = '';
+    inputAmount.value = '';
+    clearErrors();
+    inputName.focus();
+  });
+
+  // Click backdrop to cancel
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeWarnModal();
+  });
+
+  // Escape key to cancel
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('budget-warn-open')) {
+      closeWarnModal();
+    }
   });
 })();
