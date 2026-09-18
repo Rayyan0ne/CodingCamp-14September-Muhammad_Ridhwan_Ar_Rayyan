@@ -8,10 +8,11 @@
 
 /* ─── Constants & Config ─────────────────────────────────── */
 
-const LS_TRANSACTIONS = 'ebv_transactions';
-const LS_CATEGORIES   = 'ebv_categories';
-const LS_THEME        = 'ebv_theme';
-const LS_BUDGET_LIMIT = 'ebv_budget_limit';
+const LS_TRANSACTIONS    = 'ebv_transactions';
+const LS_CATEGORIES      = 'ebv_categories';
+const LS_THEME           = 'ebv_theme';
+const LS_BUDGET_LIMIT    = 'ebv_budget_limit';
+const LS_CATEGORY_COLORS = 'ebv_category_colors';
 
 const DEFAULT_CATEGORIES = ['Food', 'Transport', 'Fun'];
 
@@ -34,12 +35,13 @@ const CATEGORY_COLORS = [
 /* ─── State ──────────────────────────────────────────────── */
 
 let state = {
-  transactions: [],   // { id, name, amount, category, createdAt }
-  categories:   [],   // string[]
-  theme:        'dark',
-  sortMode:     'date', // 'date' | 'amount-desc' | 'amount-asc' | 'category'
-  chart:        null,  // Chart.js instance
-  budgetLimit:  0,     // spending budget limit in Rp (0 = no limit)
+  transactions:   [],  // { id, name, amount, category, createdAt }
+  categories:     [],  // string[]
+  categoryColors: {},  // { [categoryName]: hexColor } — persisted, never index-based
+  theme:          'dark',
+  sortMode:       'date', // 'date' | 'amount-desc' | 'amount-asc' | 'category'
+  chart:          null,   // Chart.js instance
+  budgetLimit:    0,      // spending budget limit in Rp (0 = no limit)
 };
 
 /* ─── Utility: Generate unique ID ───────────────────────── */
@@ -127,9 +129,18 @@ function attachAmountFormatter(inputEl) {
 
 /* ─── Utility: Get category color ──────────────────────── */
 
+/**
+ * Returns the stored color for a category, or falls back to the
+ * palette by index. Using a stored map means colors never shift
+ * when categories are added / removed.
+ */
 function getCategoryColor(categoryName) {
+  if (state.categoryColors[categoryName]) {
+    return state.categoryColors[categoryName];
+  }
+  // Fallback: auto-assign from palette based on current index
   const idx = state.categories.indexOf(categoryName);
-  return CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
+  return CATEGORY_COLORS[idx >= 0 ? idx % CATEGORY_COLORS.length : 0];
 }
 
 /* ─── Utility: Lighten/darken hex for badge background ─── */
@@ -151,18 +162,24 @@ function saveCategories() {
   localStorage.setItem(LS_CATEGORIES, JSON.stringify(state.categories));
 }
 
+function saveCategoryColors() {
+  localStorage.setItem(LS_CATEGORY_COLORS, JSON.stringify(state.categoryColors));
+}
+
 function saveTheme() {
   localStorage.setItem(LS_THEME, state.theme);
 }
 
 function loadFromStorage() {
-  const rawTx  = localStorage.getItem(LS_TRANSACTIONS);
-  const rawCat = localStorage.getItem(LS_CATEGORIES);
-  const rawTheme = localStorage.getItem(LS_THEME);
+  const rawTx     = localStorage.getItem(LS_TRANSACTIONS);
+  const rawCat    = localStorage.getItem(LS_CATEGORIES);
+  const rawTheme  = localStorage.getItem(LS_THEME);
+  const rawColors = localStorage.getItem(LS_CATEGORY_COLORS);
 
-  state.transactions = rawTx  ? JSON.parse(rawTx)  : [];
-  state.categories   = rawCat ? JSON.parse(rawCat) : [...DEFAULT_CATEGORIES];
-  state.theme        = rawTheme || 'dark';
+  state.transactions   = rawTx     ? JSON.parse(rawTx)     : [];
+  state.categories     = rawCat    ? JSON.parse(rawCat)    : [...DEFAULT_CATEGORIES];
+  state.theme          = rawTheme  || 'dark';
+  state.categoryColors = rawColors ? JSON.parse(rawColors) : {};
 
   const rawLimit    = localStorage.getItem(LS_BUDGET_LIMIT);
   state.budgetLimit = rawLimit ? parseFloat(rawLimit) : 0;
@@ -179,6 +196,7 @@ const txForm            = $('#transaction-form');
 const inputName         = $('#input-name');
 const inputAmount       = $('#input-amount');
 const inputCategory     = $('#input-category');
+const inputColor        = $('#input-color');       // color picker
 const inputCustomCat    = $('#input-custom-category');
 const btnAddCat         = $('#btn-add-category');
 const btnSubmit         = $('#btn-submit');
@@ -412,6 +430,15 @@ function renderMonthlyBreakdown() {
 
 /* ─── Category Select Render ────────────────────────────── */
 
+/**
+ * Sync the color picker to show the currently selected category's color.
+ */
+function updateColorPicker() {
+  if (!inputColor) return;
+  const cat = inputCategory ? inputCategory.value : '';
+  inputColor.value = getCategoryColor(cat) || CATEGORY_COLORS[0];
+}
+
 function renderCategorySelect() {
   inputCategory.innerHTML = '';
   state.categories.forEach(cat => {
@@ -420,6 +447,8 @@ function renderCategorySelect() {
     opt.textContent = cat;
     inputCategory.appendChild(opt);
   });
+  // Sync color picker to the default-selected category
+  updateColorPicker();
 }
 
 /* ─── Transaction Item HTML builder ─────────────────────── */
@@ -634,8 +663,9 @@ function updateChart() {
   if (state.chart) {
     state.chart.data.labels           = labels;
     state.chart.data.datasets[0].data = data;
-    state.chart.data.datasets[0].backgroundColor = colors.map(c => hexToRgba(c, 0.85));
-    state.chart.data.datasets[0].borderColor      = colors;
+    state.chart.data.datasets[0].backgroundColor      = colors.map(c => hexToRgba(c, 0.85));
+    state.chart.data.datasets[0].hoverBackgroundColor  = colors.map(c => hexToRgba(c, 1.0)); // ← fix: keep hover colors in sync
+    state.chart.data.datasets[0].borderColor           = colors;
 
     // Adapt chart colors for theme
     const isDark = state.theme === 'dark';
@@ -645,7 +675,7 @@ function updateChart() {
     state.chart.options.plugins.tooltip.titleColor = isDark ? '#E8EDF4' : '#1A202C';
     state.chart.options.plugins.tooltip.bodyColor  = isDark ? '#7C8AA5' : '#5A6A85';
 
-    state.chart.update('active'); // animate update
+    state.chart.update(); // ← fix: use default mode (not 'active') to avoid forcing hover state on all segments
   }
 
   // Render custom legend
@@ -811,6 +841,9 @@ txForm.addEventListener('submit', (e) => {
   inputName.focus();
 });
 
+/* ─── Sync color picker when category selection changes ──── */
+// (color picker is now only used when creating a new category — no sync needed)
+
 /* ─── Attach Rp formatters to money inputs ──────────────── */
 
 attachAmountFormatter(inputAmount);
@@ -914,16 +947,196 @@ function addCustomCategory() {
     return;
   }
 
+  // Use the color picker value, or auto-cycle from palette as fallback
+  const chosenColor = (inputColor && inputColor.value)
+    ? inputColor.value
+    : CATEGORY_COLORS[state.categories.length % CATEGORY_COLORS.length];
+
   state.categories.push(name);
+  state.categoryColors[name] = chosenColor;
   saveCategories();
+  saveCategoryColors();
   renderCategorySelect();
+  renderCustomCategoryList();
 
   // Select the new category automatically
   inputCategory.value = name;
 
+  // Reset color picker to a fresh auto-color for next potential new category
+  if (inputColor) {
+    inputColor.value = CATEGORY_COLORS[state.categories.length % CATEGORY_COLORS.length];
+  }
+
   inputCustomCat.value = '';
   showToast(`Category "${name}" added ✓`, 'info');
 }
+
+/* ─── Custom Category List (deletable chips) ────────────── */
+
+/**
+ * Renders chips only for user-added categories (not DEFAULT_CATEGORIES).
+ * Each chip has a × button that opens the delete-category modal.
+ */
+function renderCustomCategoryList() {
+  const container = document.getElementById('custom-cat-tags');
+  if (!container) return;
+
+  // Only show categories that are NOT in the default list
+  const custom = state.categories.filter(c => !DEFAULT_CATEGORIES.includes(c));
+
+  container.innerHTML = '';
+
+  if (custom.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+
+  container.style.display = '';
+
+  custom.forEach(cat => {
+    const color = getCategoryColor(cat);
+    const chip  = document.createElement('span');
+    chip.className = 'custom-cat-chip';
+    chip.style.setProperty('--chip-color', color);
+    chip.innerHTML = `
+      <span class="chip-dot" style="background:${color};"></span>
+      <span class="chip-name">${escapeHtml(cat)}</span>
+      <button
+        class="chip-delete"
+        data-cat="${escapeHtml(cat)}"
+        aria-label="Hapus kategori ${escapeHtml(cat)}"
+        title="Hapus kategori"
+        type="button"
+      >×</button>
+    `;
+    container.appendChild(chip);
+  });
+
+  // Wire delete buttons via event delegation on the container
+  container.onclick = (e) => {
+    const btn = e.target.closest('.chip-delete');
+    if (btn) openDeleteCategoryModal(btn.dataset.cat);
+  };
+}
+
+/* ─── Delete Category Modal ─────────────────────────────── */
+
+/**
+ * Opens the delete-category modal.
+ * If the category has transactions, shows the two-option layout.
+ * Otherwise shows a simple confirm/cancel layout.
+ */
+function openDeleteCategoryModal(catName) {
+  const overlay        = document.getElementById('del-cat-overlay');
+  const elName         = document.getElementById('del-cat-name');
+  const elTxInfo       = document.getElementById('del-cat-tx-info');
+  const elTxCount      = document.getElementById('del-cat-tx-count');
+  const actionsWithTx  = document.getElementById('del-cat-actions-with-tx');
+  const actionsNoTx    = document.getElementById('del-cat-actions-no-tx');
+
+  if (!overlay) return;
+
+  const txCount = state.transactions.filter(t => t.category === catName).length;
+
+  // Populate modal text
+  elName.textContent = `"${catName}"`;
+
+  if (txCount > 0) {
+    elTxInfo.style.display    = '';
+    actionsWithTx.style.display = '';
+    actionsNoTx.style.display   = 'none';
+    elTxCount.textContent = `Ada ${txCount} transaksi menggunakan kategori ini.`;
+  } else {
+    elTxInfo.style.display      = 'none';
+    actionsWithTx.style.display = 'none';
+    actionsNoTx.style.display   = '';
+  }
+
+  // Store target category on overlay for the button handlers
+  overlay._targetCat = catName;
+
+  overlay.classList.add('del-cat-open');
+  overlay.setAttribute('aria-hidden', 'false');
+
+  // Focus first visible action button
+  const firstBtn = overlay.querySelector('.del-cat-actions:not([style*="none"]) .del-cat-btn');
+  if (firstBtn) firstBtn.focus();
+}
+
+(function initDeleteCategoryModal() {
+  const overlay       = document.getElementById('del-cat-overlay');
+  const btnKeepTx     = document.getElementById('del-cat-keep-tx');
+  const btnDeleteTx   = document.getElementById('del-cat-delete-tx');
+  const btnCancelTx   = document.getElementById('del-cat-cancel-tx');
+  const btnCancelNoTx = document.getElementById('del-cat-cancel-no-tx');
+  const btnConfirmNoTx = document.getElementById('del-cat-confirm-no-tx');
+
+  if (!overlay) return;
+
+  function closeDelCatModal() {
+    overlay.classList.remove('del-cat-open');
+    overlay.setAttribute('aria-hidden', 'true');
+    overlay._targetCat = null;
+  }
+
+  function execDelete(deleteTx) {
+    const cat = overlay._targetCat;
+    closeDelCatModal();
+    if (!cat) return;
+
+    // Remove category from state
+    state.categories = state.categories.filter(c => c !== cat);
+    delete state.categoryColors[cat];
+    saveCategories();
+    saveCategoryColors();
+
+    if (deleteTx) {
+      // Remove all transactions belonging to this category
+      state.transactions = state.transactions.filter(t => t.category !== cat);
+      saveTransactions();
+    }
+    // If not deleting tx, they stay in history with their old category label
+
+    // If the deleted category was selected in the dropdown, switch to first available
+    if (inputCategory.value === cat && state.categories.length > 0) {
+      inputCategory.value = state.categories[0];
+    }
+
+    renderCategorySelect();
+    renderCustomCategoryList();
+    renderAll();
+
+    showToast(
+      deleteTx
+        ? `Kategori “${cat}” & transaksinya dihapus`
+        : `Kategori “${cat}” dihapus`,
+      'success'
+    );
+  }
+
+  // Hapus kategori, simpan transaksi
+  btnKeepTx.addEventListener('click',     () => execDelete(false));
+  // Hapus kategori & semua transaksinya
+  btnDeleteTx.addEventListener('click',   () => execDelete(true));
+  // Batal (with-tx variant)
+  btnCancelTx.addEventListener('click',   closeDelCatModal);
+  // Batal (no-tx variant)
+  btnCancelNoTx.addEventListener('click', closeDelCatModal);
+  // Ya, Hapus (no-tx variant)
+  btnConfirmNoTx.addEventListener('click', () => execDelete(false));
+
+  // Click backdrop to cancel
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeDelCatModal();
+  });
+
+  // Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('del-cat-open')) {
+      closeDelCatModal();
+    }
+  });
+})();
 
 /* ─── Dark / Light Theme Toggle ─────────────────────────── */
 
@@ -992,7 +1205,7 @@ function init() {
   applyTheme(state.theme);
 
   // 3. Populate category dropdown
-  renderCategorySelect();
+  renderCategorySelect(); // also syncs updateColorPicker
 
   // 4. Initialise chart
   initChart();
@@ -1002,6 +1215,14 @@ function init() {
 
   // 5b. Initialise budget limit UI (populate input + progress bar)
   renderBudgetLimitUI();
+
+  // 5c. Render deletable custom category chips
+  renderCustomCategoryList();
+
+  // 5d. Set initial color picker value (auto-cycle from palette)
+  if (inputColor) {
+    inputColor.value = CATEGORY_COLORS[state.categories.length % CATEGORY_COLORS.length];
+  }
 
   // 6. Set initial previousBalance without animation
   previousBalance = state.transactions.reduce((s, t) => s + t.amount, 0);

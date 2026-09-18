@@ -132,6 +132,34 @@
     </div>
   </div>
 
+  <!-- ─── Delete Category Modal ─── -->
+  <div id="del-cat-overlay" class="del-cat-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="del-cat-title">
+    <div class="del-cat-card">
+      <!-- Icon -->
+      <div class="del-cat-icon-wrap" aria-hidden="true">
+        <span class="del-cat-icon">🗑</span>
+      </div>
+      <!-- Title -->
+      <h2 class="del-cat-title" id="del-cat-title">Hapus Kategori</h2>
+      <p class="del-cat-name" id="del-cat-name"></p>
+      <!-- Info when transactions exist -->
+      <div class="del-cat-tx-info" id="del-cat-tx-info" style="display:none;">
+        <p class="del-cat-tx-count" id="del-cat-tx-count"></p>
+        <p class="del-cat-tx-sub">Pilih tindakan untuk transaksi tersebut:</p>
+      </div>
+      <!-- Actions -->
+      <div class="del-cat-actions" id="del-cat-actions-with-tx" style="display:none;">
+        <button id="del-cat-keep-tx" class="del-cat-btn del-cat-btn-keep" type="button">Hapus kategori, simpan transaksi</button>
+        <button id="del-cat-delete-tx" class="del-cat-btn del-cat-btn-danger" type="button">Hapus kategori &amp; semua transaksinya</button>
+        <button id="del-cat-cancel-tx" class="del-cat-btn del-cat-btn-cancel" type="button">Batal</button>
+      </div>
+      <div class="del-cat-actions" id="del-cat-actions-no-tx" style="display:none;">
+        <button id="del-cat-cancel-no-tx" class="del-cat-btn del-cat-btn-cancel" type="button">Batal</button>
+        <button id="del-cat-confirm-no-tx" class="del-cat-btn del-cat-btn-danger" type="button">Ya, Hapus</button>
+      </div>
+    </div>
+  </div><!-- /del-cat-overlay -->
+
   <!-- ─── Header ─── -->
   <header class="app-header">
     <div class="header-inner">
@@ -233,6 +261,8 @@
               </div>
             </div>
 
+            <!-- Category Color Picker is now inside New Category row -->
+
             <!-- Custom Category -->
             <div class="field-group custom-category-group" id="field-custom-group">
               <label for="input-custom-category" class="field-label">
@@ -240,6 +270,13 @@
                 <span class="label-hint">(optional)</span>
               </label>
               <div class="custom-cat-row">
+                <input
+                  type="color"
+                  id="input-color"
+                  class="color-picker-input color-picker-inline"
+                  aria-label="Pick color for new category"
+                  title="Pilih warna untuk kategori baru"
+                />
                 <input
                   type="text"
                   id="input-custom-category"
@@ -251,6 +288,8 @@
                   + Add
                 </button>
               </div>
+              <!-- Deletable chips for user-added categories -->
+              <div class="custom-cat-tags" id="custom-cat-tags" aria-label="Custom categories"></div>
             </div>
 
             <button type="submit" id="btn-submit" class="btn btn-primary btn-full">

@@ -2072,3 +2072,289 @@ input[type="number"] { -moz-appearance: textfield; }
 .budget-warn-btn-cancel:active {
   transform: translateY(0);
 }
+
+/* ─── Color Picker Field ─────────────────────────────────── */
+
+.color-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.color-picker-input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 56px;
+  height: 40px;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-input);
+  cursor: pointer;
+  padding: 3px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.color-picker-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.color-picker-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 7px;
+}
+
+.color-picker-input::-moz-color-swatch {
+  border: none;
+  border-radius: 7px;
+}
+
+.color-picker-input:hover {
+  border-color: var(--accent-primary);
+  box-shadow: var(--glow-primary);
+  transform: scale(1.05);
+}
+
+.color-picker-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: var(--glow-primary);
+}
+
+.color-picker-hint {
+  font-size: 0.78rem;
+  color: var(--text-subtle);
+  line-height: 1.4;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* ─── Inline Color Picker (inside New Category row) ─────── */
+
+.color-picker-inline {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  padding: 2px;
+}
+
+/* ─── Custom Category Chips ──────────────────────────────── */
+
+.custom-cat-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.custom-cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 10px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--chip-color, #00F0FF) 35%, transparent);
+  background: color-mix(in srgb, var(--chip-color, #00F0FF) 10%, transparent);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: background 0.18s ease;
+}
+
+.custom-cat-chip:hover {
+  background: color-mix(in srgb, var(--chip-color, #00F0FF) 18%, transparent);
+}
+
+.chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chip-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.chip-delete:hover {
+  background: var(--accent-danger);
+  color: #fff;
+  transform: scale(1.15);
+}
+
+/* ─── Delete Category Modal ──────────────────────────────── */
+
+.del-cat-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.del-cat-overlay.del-cat-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.del-cat-card {
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  box-shadow: var(--shadow-elevated);
+  padding: 32px 28px 24px;
+  max-width: 400px;
+  width: calc(100% - 32px);
+  text-align: center;
+  transform: scale(0.9) translateY(16px);
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.del-cat-overlay.del-cat-open .del-cat-card {
+  transform: scale(1) translateY(0);
+}
+
+.del-cat-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 61, 90, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 1.6rem;
+}
+
+.del-cat-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.del-cat-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  margin-bottom: 12px;
+}
+
+.del-cat-tx-info {
+  background: rgba(255, 184, 48, 0.08);
+  border: 1px solid rgba(255, 184, 48, 0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.del-cat-tx-count {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--accent-warning);
+  margin-bottom: 4px;
+}
+
+.del-cat-tx-sub {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.del-cat-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.del-cat-btn {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.18s ease, color 0.18s ease,
+              border-color 0.18s ease, transform 0.13s ease,
+              box-shadow 0.18s ease;
+}
+
+.del-cat-btn:active {
+  transform: translateY(0) !important;
+}
+
+/* Keep transactions button — outlined safe style */
+.del-cat-btn-keep {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.del-cat-btn-keep:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Danger — delete everything */
+.del-cat-btn-danger {
+  background: var(--accent-danger);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(255, 61, 90, 0.35);
+}
+
+.del-cat-btn-danger:hover {
+  background: #ff5570;
+  box-shadow: 0 6px 24px rgba(255, 61, 90, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Cancel — subtle ghost */
+.del-cat-btn-cancel {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.del-cat-btn-cancel:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
