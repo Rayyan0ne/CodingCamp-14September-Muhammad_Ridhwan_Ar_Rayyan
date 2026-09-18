@@ -69,6 +69,62 @@ function formatDate(ts) {
   }).format(new Date(ts));
 }
 
+/* ─── Utility: Format / Parse amount input fields ───────── */
+
+/**
+ * Converts a raw number to the "Rp X.XXX" display string.
+ * e.g. 1500000 → "Rp 1.500.000"
+ */
+function formatAmountInput(value) {
+  if (value === '' || value === null || value === undefined) return '';
+  const num = Math.floor(Math.abs(Number(value)));
+  if (isNaN(num)) return '';
+  return 'Rp ' + num.toLocaleString('id-ID');
+}
+
+/**
+ * Strips "Rp ", dots (thousand separators) and returns a float.
+ * e.g. "Rp 1.500.000" → 1500000
+ */
+function parseAmountInput(str) {
+  if (!str) return NaN;
+  // Remove "Rp" prefix and all dots (id-ID thousand separator)
+  const cleaned = str.replace(/Rp\s*/i, '').replace(/\./g, '').replace(/,/g, '').trim();
+  return parseFloat(cleaned);
+}
+
+/**
+ * Applies live "Rp X.XXX" formatting to an input element while the
+ * user is typing. Preserves cursor position.
+ */
+function attachAmountFormatter(inputEl) {
+  inputEl.addEventListener('input', () => {
+    const raw = inputEl.value;
+    // Strip everything except digits
+    const digits = raw.replace(/[^0-9]/g, '');
+
+    if (digits === '') {
+      inputEl.value = '';
+      return;
+    }
+
+    const num = parseInt(digits, 10);
+    inputEl.value = formatAmountInput(num);
+  });
+
+  // On focus: if empty placeholder showing, leave blank for easier entry
+  inputEl.addEventListener('focus', () => {
+    if (inputEl.value === '') inputEl.placeholder = 'Rp 0';
+  });
+
+  // On blur: if empty, clear back to empty (placeholder takes over)
+  inputEl.addEventListener('blur', () => {
+    if (inputEl.value.replace(/[^0-9]/g, '') === '') {
+      inputEl.value = '';
+    }
+  });
+}
+
 /* ─── Utility: Get category color ──────────────────────── */
 
 function getCategoryColor(categoryName) {
@@ -248,7 +304,7 @@ function checkBudgetLimit() {
 
 function renderBudgetLimitUI() {
   if (inputBudgetLimit) {
-    inputBudgetLimit.value = state.budgetLimit > 0 ? state.budgetLimit : '';
+    inputBudgetLimit.value = state.budgetLimit > 0 ? formatAmountInput(state.budgetLimit) : '';
   }
   checkBudgetLimit();
 }
@@ -724,7 +780,7 @@ txForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const name     = inputName.value.trim();
-  const amount   = parseFloat(inputAmount.value);
+  const amount   = parseAmountInput(inputAmount.value);
   const category = inputCategory.value;
 
   let valid = true;
@@ -754,6 +810,11 @@ txForm.addEventListener('submit', (e) => {
   clearErrors();
   inputName.focus();
 });
+
+/* ─── Attach Rp formatters to money inputs ──────────────── */
+
+attachAmountFormatter(inputAmount);
+attachAmountFormatter(inputBudgetLimit);
 
 /* ─── Ripple Effect ─────────────────────────────────────── */
 
@@ -793,7 +854,7 @@ inputName.addEventListener('input', () => {
 });
 
 inputAmount.addEventListener('input', () => {
-  const val = parseFloat(inputAmount.value);
+  const val = parseAmountInput(inputAmount.value);
   if (!isNaN(val) && val > 0) {
     $('#field-amount-group').classList.remove('has-error');
   }
@@ -959,14 +1020,15 @@ function init() {
 $$('.limit-adj-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const delta   = parseInt(btn.dataset.delta, 10);
-    const current = parseFloat(inputBudgetLimit.value) || 0;
-    inputBudgetLimit.value = Math.max(0, current + delta);
+    const current = parseAmountInput(inputBudgetLimit.value) || 0;
+    const newVal  = Math.max(0, current + delta);
+    inputBudgetLimit.value = newVal > 0 ? formatAmountInput(newVal) : '';
   });
 });
 
 // Update / Set limit button
 btnSetLimit.addEventListener('click', () => {
-  const val         = parseFloat(inputBudgetLimit.value) || 0;
+  const val         = parseAmountInput(inputBudgetLimit.value) || 0;
   state.budgetLimit = val;
   localStorage.setItem(LS_BUDGET_LIMIT, val);
   createRipple(btnSetLimit);
@@ -1202,6 +1264,8 @@ function openBudgetWarnModal(pending) {
     inputAmount.value = '';
     clearErrors();
     inputName.focus();
+    // Clear validation state
+    $('#field-amount-group').classList.remove('has-error');
   });
 
   // Click backdrop to cancel

@@ -170,8 +170,8 @@
   <main class="app-main">
 
     <!-- ── Balance Hero ── -->
-    <section class="balance-section" aria-label="Total balance">
-      <p class="balance-label">Total Balance</p>
+    <section class="balance-section" aria-label="Total spending">
+      <p class="balance-label">Total Spending</p>
       <div class="balance-amount-wrapper">
         <span class="balance-currency">Rp</span>
         <span id="balance-display" class="balance-amount" aria-live="polite">0</span>
@@ -211,13 +211,13 @@
             <div class="field-group" id="field-amount-group">
               <label for="input-amount" class="field-label">Amount (Rp)</label>
               <input
-                type="number"
+                type="text"
+                inputmode="numeric"
                 id="input-amount"
                 class="field-input"
-                placeholder="0"
-                min="1"
-                step="any"
+                placeholder="Rp 0"
                 aria-required="true"
+                autocomplete="off"
               />
               <span class="field-error" id="error-amount" role="alert">Enter a valid amount</span>
             </div>
@@ -312,13 +312,14 @@
             <div class="limit-input-wrap">
               <span class="limit-currency-label" aria-hidden="true">Rp</span>
               <input
-                type="number"
+                type="text"
+                inputmode="numeric"
                 id="input-budget-limit"
                 class="field-input limit-number-input"
-                placeholder="0"
+                placeholder="Rp 0"
                 min="0"
-                step="1000"
                 aria-label="Jumlah budget limit dalam rupiah"
+                autocomplete="off"
               />
             </div>
             <div class="limit-adj-group">
