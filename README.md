@@ -29,16 +29,18 @@ Every feature — from the animated splash screen to the real-time doughnut char
 | Feature | Description |
 |---|---|
 | **Add Transactions** | Input item name, amount (Rp), and category with real-time form validation and shake animations on error |
+| **Rp Number Formatting** | Amount input auto-formats with thousand separators as you type — e.g. `10000` becomes `Rp 10.000` live |
 | **Transaction List** | Scrollable list with slide-in/out animations, sortable by your preference |
-| **Total Balance** | Count-up animation display, color-coded (🟢 healthy / 🔴 over budget) |
-| **Spending Chart** | Animated doughnut chart (Chart.js) with a custom legend showing each category's percentage |
+| **Total Spending** | Count-up animation display showing cumulative spending, color-coded (🟢 healthy / 🔴 over budget) |
+| **Spending Chart** | Animated doughnut chart (Chart.js) with a custom legend; colors are permanently stored per category — no color-shift bugs |
 
 ### ⚙️ Advanced Features
 | Feature | Description |
 |---|---|
-| **Budget Limit** | Set a spending cap in Rp; a progress bar shows how much of the limit has been consumed |
+| **Budget Limit** | Set a spending cap in Rp with quick ±adjust buttons (±10k / ±50k / ±100k); a progress bar shows consumption |
 | **Budget Warning Modal** | If a new transaction would push the total over your limit, a modal appears with a full cost breakdown — cancel or confirm to proceed anyway |
-| **Custom Categories** | Create new spending categories on the fly — auto color-assigned and persisted |
+| **Custom Categories + Color Picker** | Create new spending categories with a custom color chosen via an inline color picker — color is saved permanently and shown in the chart |
+| **Delete Custom Categories** | User-added categories can be deleted via a chip tag with a ✕ button; a modal asks what to do with existing transactions (keep or delete them) |
 | **Sort Transactions** | Sort by Date, Amount (↑ or ↓), or Category with FLIP-style reorder animations |
 | **Monthly Summary** | View spending per category filtered by month |
 | **Dark / Light Mode** | Sun↔moon toggle with smooth CSS transitions, preference saved in `localStorage` |
@@ -153,6 +155,7 @@ All data lives in `localStorage`. Nothing is ever sent to a server.
 |---|---|---|
 | `ebv_transactions` | `Array<{id, name, amount, category, createdAt}>` | All recorded transactions |
 | `ebv_categories` | `string[]` | Default + custom categories |
+| `ebv_category_colors` | `{ [categoryName]: string }` | Hex color map per category — persisted so chart colors never shift |
 | `ebv_theme` | `"dark" \| "light"` | User's saved theme preference |
 | `ebv_budget_limit` | `number` | Spending cap in Rupiah (0 = no limit) |
 
@@ -193,9 +196,13 @@ All data lives in `localStorage`. Nothing is ever sent to a server.
 - [x] `.kiro/` folder exists at project root
 - [x] Responsive at 375px mobile viewport
 - [x] Dark/light mode consistent across all components including the chart
-- [x] Budget limit with warning modal
+- [x] Budget limit with warning modal and quick ±adjust buttons
 - [x] Animated splash screen with click-to-enter
 - [x] Exit flow with confirmation modal
+- [x] Rp thousand-separator formatting on all money inputs (live, as-you-type)
+- [x] Custom category color picker — color stored permanently, no index-based shifting
+- [x] Delete custom category with modal — choose to keep or delete associated transactions
+- [x] Chart hover color bug fixed — `hoverBackgroundColor` now always stays in sync
 
 ---
 
